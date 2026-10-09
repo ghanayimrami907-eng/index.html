@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הכל למזגן - متجر ونظام المكيفات الذكي</title>
+    <style>
+        :root {
+            --primary: #06b6d4;
+            --primary-dark: #0891b2;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --radius: 16px;
+            --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* الشريط الجانبي */
+        aside {
+            width: 280px;
+            background-color: white;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.02);
+            justify-content: space-between;
+        }
+        .aside-top {
+            display: flex;
+            flex-direction: column;
+        }
+        .brand-logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s;
+        }
+        .brand-logo:hover {
+            opacity: 0.8;
+        }
+        .brand-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .nav-links li button {
+            width: 100%;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            color: var(--text-muted);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            text-align: right;
+        }
+        .nav-links li.active button, .nav-links li button:hover {
+            background-color: rgba(6, 182, 212, 0.15);
+            color: var(--primary);
+        }
+
+        /* زر الاتصال في الأسفل */
+        .call-btn-container {
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .btn-call {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-call:hover { background-color: #059669; }
+
+        /* المحتوى الرئيسي */
+        main {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .section { display: none; flex: 1; flex-direction: column; animation: fadeIn 0.3s ease; }
+        .section.active { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .top-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .master-layout {
+            display: flex;
+            gap: 25px;
+            flex: 1;
+            align-items: flex-start;
+        }
+        .sub-sidebar {
+            width: 260px;
+            background: rgba(0,0,0,0.02);
+            padding: 16px;
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .sub-sidebar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            padding-right: 8px;
+        }
+        .category-btn {
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: right;
+            padding: 14px 16px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .category-btn:hover { background: rgba(6, 182, 212, 0.08); }
+        .category-btn.active {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--primary);
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .desc-box {
+            background: rgba(6, 182, 212, 0.08);
+            padding: 20px;
+            border-radius: var(--radius);
+            border-right: 4px solid var(--primary);
+        }
+        .desc-box h3 { font-size: 18px; color: var(--primary); margin-bottom: 6px; }
+        .desc-box p { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .card-item {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        .card-item:hover { transform: translateY(-3px); }
+        .card-img-placeholder {
+            height: 140px;
+            background: rgba(6, 182, 212, 0.08);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 36px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 10;
+            transition: 0.2s;
+        }
+        .delete-btn:hover { background: var(--danger); transform: scale(1.1); }
+        body.unlocked .delete-btn { display: flex !important; }
+        
+        .item-title { font-size: 18px; font-weight: 700; color: var(--text-main); }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-card {
+            background: white;
+            width: 450px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { font-size: 20px; font-weight: 700; }
+        .close-modal { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            background: #f8fafc;
+        }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 14px; font-weight: 700; color: var(--text-muted); }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: var(--primary-dark); }
+
+        .intro-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+        .intro-icon-circle {
+            width: 120px; height: 120px;
+            background: rgba(6, 182, 212, 0.12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 56px;
+        }
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            text-align: right;
+        }
+        .feature-box {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 22px;
+            background: white;
+            border-radius: 14px;
+            border: 1px solid #f1f5f9;
+            box-shadow: var(--shadow);
+        }
+        .feature-icon {
+            width: 55px; height: 55px;
+            background: rgba(6, 182, 212, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .calculator-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .calc-result-box {
+            background: rgba(6, 182, 212, 0.1);
+            padding: 20px;
+            border-radius: 14px;
+            display: none;
+            text-align: center;
+        }
+        .calc-result-box h3 { color: var(--primary); font-size: 20px; margin-bottom: 8px; }
+        .calc-result-box p { font-size: 16px; font-weight: 600; }
+        
+        .admin-controls {
+            display: none;
+            gap: 10px;
+        }
+        .admin-controls.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body id="app-body">
+
+    <!-- الشريط الجانبي الرئيسي مع شعار قابل للضغط مرتين -->
+    <aside>
+        <div class="aside-top">
+            <div class="brand-logo" ondblclick="requestAccess()" title="اضغط مرتين لفتح صلاحيات الإدارة">
+                <span>הכל למזגן</span>
+                <span class="brand-sub">❄️ إدارة المكيفات الذكية</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><button onclick="switchTab('intro', this)">✨ الرئيسية</button></li>
+                <li><button onclick="switchTab('products', this)">💨 المكيفات</button></li>
+                <li><button onclick="switchTab('supplies', this)">🛠️ المستلزمات والخدمات</button></li>
+                <li><button onclick="switchTab('calculator', this)">📐 حاسبة المساحة</button></li>
+            </ul>
+        </div>
+        
+        <div class="call-btn-container">
+            <a href="tel:0500000000" class="btn-call">
+                📞 اتصل بنا الآن
+            </a>
+        </div>
+    </aside>
+
+    <main>
+        <!-- 1. صفحة الرئيسية -->
+        <section id="intro" class="section active">
+            <div class="top-header">
+                <h1>عن التطبيق</h1>
+            </div>
+            <div class="intro-container">
+                <div class="intro-icon-circle">❄️</div>
+                <div>
+                    <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 10px;">مرحباً بك في متجر הכל למזגן</h2>
+                    <p style="color: var(--text-muted); font-size: 18px;">بوابتك الذكية لحلول التكييف المتكاملة والاحترافية</p>
+                </div>
+                <div class="features-list">
+                    <div class="feature-box">
+                        <div class="feature-icon">🌬️</div>
+                        <div>
+                            <h4 style="font-size: 18px; font-weight: 700;">أفضل الماركات العالمية</h4>
+                            <p style="color: var(--text-muted); font-size: 14px;">تشكيلة واسعة وعالية الجودة من مكيفات إلكترا، هايير، وفاميلي.</p>
+                        </div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon">🔧</div>
+                        <div>
+                            <h4 style="font-size: 18px; font-weight: 700;">خدمات وصيانة احترافية</h4>
+                            <p style="color: var(--text-muted); font-size: 14px;">فريق فني متخصص ومؤهل لتركيب وغسيل وصيانة المكيفات بأعلى معايير الجودة.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. صفحة المكيفات -->
+        <section id="products" class="section">
+            <div class="top-header">
+                <h1>المكيفات</h1>
+                <div id="product-admin-btn" class="admin-controls">
+                    <button class="btn" onclick="openModal('product-modal')">➕ اضف مكيف جديد</button>
+                </div>
+            </div>
+            <div class="master-layout">
+                <div class="sub-sidebar">
+                    <div class="sub-sidebar-title">الشركات والماركات</div>
+                    <button class="category-btn active" onclick="filterProducts('الكل', this)">الكل</button>
+                    <button class="category-btn" onclick="filterProducts('Electra', this)">Electra</button>
+                    <button class="category-btn" onclick="filterProducts('Hair', this)">Hair</button>
+                    <button class="category-btn" onclick="filterProducts('Family', this)">Family</button>
+                </div>
+                <div class="content-area">
+                    <div class="desc-box">
+                        <h3 id="prod-desc-title">عن قسم: الكل</h3>
+                        <p id="prod-desc-text">عرض كافة أنواع المكيفات والماركات المتوفرة في المتجر بجودة عالية.</p>
+                    </div>
+                    <div id="products-grid" class="grid-cards"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. صفحة المستلزمات والخدمات (بدون أي تصفية جانبية نهائياً) -->
+        <section id="supplies" class="section">
+            <div class="top-header">
+                <h1>المستلزمات والخدمات</h1>
+                <div id="supply-admin-btn" class="admin-controls">
+                    <button class="btn" onclick="openModal('supply-modal')">➕ إضافة مستلزم جديد</button>
+                </div>
+            </div>
+            <div class="content-area">
+                <div class="desc-box">
+                    <h3>كافة المستلزمات والقطع والخدمات</h3>
+                    <p>تشكيلة متكاملة من المستلزمات، قطع الغيار، وخدمات الصيانة والتركيب الاحترافية المعروضة مباشرة.</p>
+                </div>
+                <div id="supplies-grid" class="grid-cards"></div>
+            </div>
+        </section>
+
+        <!-- 4. صفحة حاسبة المساحة -->
+        <section id="calculator" class="section">
+            <div class="top-header">
+                <h1>حاسبة مساحة الغرفة</h1>
+            </div>
+            <div class="calculator-card">
+                <p style="color: var(--text-muted); font-size: 15px;">أدخل أبعاد الغرفة بالمتر لحساب المساحة الإجمالية وتحديد قوة المكيف المناسبة:</p>
+                <div style="display: flex; gap: 15px;">
+                    <input type="number" id="calc-length" placeholder="الطول (متر)">
+                    <input type="number" id="calc-width" placeholder="العرض (متر)">
+                </div>
+                <button class="btn" style="justify-content: center;" onclick="calculateArea()">حساب المساحة وقوة المكيف</button>
+                
+                <div id="calc-result" class="calc-result-box">
+                    <h3>نتائج الحساب والتقدير</h3>
+                    <p id="calc-area-text" style="margin-bottom: 6px;"></p>
+                    <p id="calc-power-text" style="color: var(--text-muted);"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- نافذة إدخال الكود السري -->
+    <div id="code-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>صلاحيات الإدارة</h3>
+                <button class="close-modal" onclick="closeModal('code-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>أدخل الكود السري لإتمام العملية</label>
+                <input type="password" id="secret-code-input" placeholder="أدخل الكود هنا...">
+            </div>
+            <button class="btn" style="justify-content: center;" onclick="verifyCode()">تحقق ومتابعة</button>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة مكيف -->
+    <div id="product-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>إضافة مكيف جديد</h3>
+                <button class="close-modal" onclick="closeModal('product-modal')">&times;</button>
+            </div>
+            <form onsubmit="addProduct(event)" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-group">
+                    <label>اسم المكيف</label>
+                    <input type="text" id="p-name" required placeholder="مثال: مكيف سبيلت 1.5 حصان">
+                </div>
+                <div class="form-group">
+                    <label>اختر الماركة</label>
+                    <select id="p-category">
+                        <option value="Electra">Electra</option>
+                        <option value="Hair">Hair</option>
+                        <option value="Family">Family</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>صورة المكيف (اختياري)</label>
+                    <input type="file" id="p-image" accept="image/*">
+                </div>
+                <button type="submit" class="btn" style="justify-content: center; margin-top: 10px;">حفظ وإضافة المكيف</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة مستلزم (بدون قسم) -->
+    <div id="supply-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>إضافة مستلزم أو خدمة جديدة</h3>
+                <button class="close-modal" onclick="closeModal('supply-modal')">&times;</button>
+            </div>
+            <form onsubmit="addSupply(event)" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-group">
+                    <label>اسم الخدمة أو المنتج</label>
+                    <input type="text" id="s-name" required placeholder="مثال: قطعة تكييف">
+                </div>
+                <div class="form-group">
+                    <label>صورة المستلزم أو الخدمة (اختياري)</label>
+                    <input type="file" id="s-image" accept="image/*">
+                </div>
+                <button type="submit" class="btn" style="justify-content: center; margin-top: 10px;">حفظ وإضافة المستلزم</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const productDescriptions = {
+            "الكل": "عرض كافة أنواع المكيفات والماركات المتوفرة في المتجر بجودة عالية.",
+            "Electra": "مكيفات إلكترا الرائدة عالمياً: تتميز بالكفاءة العالية في توفير الطاقة، التبريد السريع، والاعتمادية الطويلة.",
+            "Hair": "مكيفات هايير الذكية: تصميم عصري أنيق، تقنيات هادئة للغاية، وتوزيع هواء مثالي لجميع أرجاء الغرفة.",
+            "Family": "مكيفات فاميلي الاقتصادية: الأداء القوي والموثوقية العالية بأسعار تناسب كل عائلة وصديقة للجيب."
+        };
+
+        let products = JSON.parse(localStorage.getItem('web_products')) || [];
+        let supplies = JSON.parse(localStorage.getItem('web_supplies')) || [];
+
+        let currentProductFilter = "الكل";
+        let isAdminUnlocked = false;
+
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('aside .nav-links li').forEach(l => l.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            btnElement.parentElement.classList.add('active');
+        }
+
+        function openModal(modalId) { document.getElementById(modalId).classList.add('open'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+
+        function requestAccess() {
+            if (isAdminUnlocked) {
+                alert('صلاحيات الإدارة مفعلة مسبقاً!');
+                return;
+            }
+            document.getElementById('secret-code-input').value = '';
+            openModal('code-modal');
+        }
+
+        function verifyCode() {
+            const enteredCode = document.getElementById('secret-code-input').value;
+            if (enteredCode === "201517") {
+                isAdminUnlocked = true;
+                closeModal('code-modal');
+                document.querySelectorAll('.admin-controls').forEach(el => el.classList.add('show'));
+                document.getElementById('app-body').classList.add('unlocked');
+                renderProducts();
+                renderSupplies();
+                alert('تم تفعيل صلاحيات الإدارة بنجاح!');
+            } else {
+                alert('الكود غير صحيح! حاول مرة أخرى.');
+            }
+        }
+
+        function filterProducts(category, btnElement) {
+            currentProductFilter = category;
+            btnElement.parentElement.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            document.getElementById('prod-desc-title').innerText = `عن قسم: ${category}`;
+            document.getElementById('prod-desc-text').innerText = productDescriptions[category];
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+            let filtered = currentProductFilter === "الكل" ? products : products.filter(p => p.category === currentProductFilter);
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 50px;">لا توجد مكيفات مضافة حالياً في قسم ${currentProductFilter}</div>`;
+                return;
+            }
+
+            filtered.forEach((p, index) => {
+                let imgContent = p.image ? `<img src="${p.image}">` : `❄`;
+                grid.innerHTML += `
+                    <div class="card-item">
+                        <button class="delete-btn" onclick="deleteProduct(${index})">✕</button>
+                        <div class="card-img-placeholder">${imgContent} <span class="badge">${p.category}</span></div>
+                        <div class="item-title">${p.name}</div>
+                    </div>
+                `;
+            });
+            localStorage.setItem('web_products', JSON.stringify(products));
+        }
+
+        function addProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('p-name').value;
+            const category = document.getElementById('p-category').value;
+            const imageInput = document.getElementById('p-image');
+
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    products.push({ name, category, image: uploadEvent.target.result });
+                    renderProducts();
+                    closeModal('product-modal');
+                    e.target.reset();
+                };
+                reader.readAsDataURL(imageInput.files[0]);
+            } else {
+                products.push({ name, category, image: null });
+                renderProducts();
+                closeModal('product-modal');
+                e.target.reset();
+            }
+        }
+
+        function deleteProduct(index) {
+            if (!isAdminUnlocked) {
+                alert('يرجى تفعيل صلاحيات الإدارة أولاً عبر النقر المزدوج على الشعار.');
+                return;
+            }
+            products.splice(index, 1);
+            renderProducts();
+        }
+
+        // عرض المستلزمات مباشرة وبدون أي تصفية جانبية
+        function renderSupplies() {
+            const grid = document.getElementById('supplies-grid');
+            grid.innerHTML = '';
+
+            if (supplies.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 50px;">لا توجد مستلزمات أو خدمات مضافة حالياً</div>`;
+                return;
+            }
+
+            supplies.forEach((s, index) => {
+                let imgContent = s.image ? `<img src="${s.image}">` : `🛠️`;
+                grid.innerHTML += `
+                    <div class="card-item">
+                        <button class="delete-btn" onclick="deleteSupply(${index})">✕</button>
+                        <div class="card-img-placeholder">${imgContent}</div>
+                        <div class="item-title">${s.name}</div>
+                    </div>
+                `;
+            });
+            localStorage.setItem('web_supplies', JSON.stringify(supplies));
+        }
+
+        function addSupply(e) {
+            e.preventDefault();
+            const name = document.getElementById('s-name').value;
+            const imageInput = document.getElementById('s-image');
+
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    supplies.push({ name, image: uploadEvent.target.result });
+                    renderSupplies();
+                    closeModal('supply-modal');
+                    e.target.reset();
+                };
+                reader.readAsDataURL(imageInput.files[0]);
+            } else {
+                supplies.push({ name, image: null });
+                renderSupplies();
+                closeModal('supply-modal');
+                e.target.reset();
+            }
+        }
+
+        function deleteSupply(index) {
+            if (!isAdminUnlocked) {
+                alert('يرجى تفعيل صلاحيات الإدارة أولاً عبر النقر المزدوج على الشعار.');
+                return;
+            }
+            supplies.splice(index, 1);
+            renderSupplies();
+        }
+
+        function calculateArea() {
+            const length = parseFloat(document.getElementById('calc-length').value);
+            const width = parseFloat(document.getElementById('calc-width').value);
+            const resultBox = document.getElementById('calc-result');
+            const areaText = document.getElementById('calc-area-text');
+            const powerText = document.getElementById('calc-power-text');
+
+            if (!length || !width || length <= 0 || width <= 0) {
+                alert('الرجاء إدخال أبعاد صحيحة (الطول والعرض بالمتر).');
+                return;
+            }
+
+            const area = length * width;
+            let recommendedPower = "";
+
+            if (area <= 12) {
+                recommendedPower = "مكيف بقوة 1 حصان (حوالي 9,000 BTU) مناسب جداً لهذه المساحة.";
+            } else if (area <= 20) {
+                recommendedPower = "مكيف بقوة 1.5 حصان (حوالي 12,000 - 14,000 BTU) مثالي لهذه الغرفة.";
+            } else if (area <= 35) {
+                recommendedPower = "مكيف بقوة 2 إلى 2.5 حصان (18,000 - 24,000 BTU) لضمان تبريد ممتاز.";
+            } else {
+                recommendedPower = "مكيف بقوة 3 حصان أو نظام تكييف متعدد (VRF/مركزى) نظراً لكبر المساحة.";
+            }
+
+            areaText.innerText = `مساحة الغرفة الإجمالية: ${area.toFixed(2)} متر مربع`;
+            powerText.innerText = `التوصية المقترحة: ${recommendedPower}`;
+            resultBox.style.display = 'block';
+        }
+
+        window.onload = function() {
+            renderProducts();
+            renderSupplies();
+        };
+    </script>
+</body>
+</html>
